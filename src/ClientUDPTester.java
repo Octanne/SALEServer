@@ -11,8 +11,8 @@ import java.net.UnknownHostException;
 
 public class ClientUDPTester {
 
-    public final int port;
-    public final String addresseStr;
+    private final int port;
+    private final String addresseStr;
 
     /**
      * Construit un client UDP

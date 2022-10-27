@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.UUID;
 
 public class PoneOffreEnergie implements Serializable {
 
@@ -23,7 +24,7 @@ public class PoneOffreEnergie implements Serializable {
     private final GregorianCalendar dateDisponibilite;
     private final int prixUE;
 
-    private Optional<TareID> tareAcheteur;
+    private final UUID offreID;
 
     public PoneOffreEnergie(int quantiteEnergie, EnergieType typeEnergie, ExtractionType extractionType
             , Pays origine, int prixUE, DispoAt dispoAt) {
@@ -33,6 +34,7 @@ public class PoneOffreEnergie implements Serializable {
         this.origine = origine;
         this.prixUE = prixUE;
         this.dateDisponibilite = dispoAt.getCalendar();
+        this.offreID = UUID.randomUUID();
     }
 
     public int getQuantiteEnergie() {
@@ -66,24 +68,16 @@ public class PoneOffreEnergie implements Serializable {
                 '}';
     }
 
+    public UUID getOffreID() {
+        return offreID;
+    }
+
     private static String timeToShow(GregorianCalendar time) {
         return time.get(GregorianCalendar.YEAR) + "-" +
                 time.get(GregorianCalendar.MONTH) + "-" +
                 time.get(GregorianCalendar.DAY_OF_MONTH) + " " +
                 time.get(GregorianCalendar.HOUR_OF_DAY) + ":" +
                 time.get(GregorianCalendar.MINUTE);
-    }
-
-    public boolean hasTareAcheteur() {
-        return tareAcheteur.isPresent();
-    }
-
-    public void setTareAcheteur(TareID tareAcheteur) {
-        this.tareAcheteur = Optional.of(tareAcheteur);
-    }
-
-    public TareID getTareAcheteur() {
-        return tareAcheteur.get();
     }
 
     public boolean isDisponible() {

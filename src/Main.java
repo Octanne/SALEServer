@@ -1,4 +1,5 @@
 import sale_server.ServeurSALE;
+import sale_server.requete.AbstractRequete;
 
 import java.util.Scanner;
 
@@ -24,15 +25,23 @@ public class Main {
                 System.out.println("ServeurSALE stopped");
                 serveurSALE.startServer();
                 System.out.println("ServeurSALE restarted");
+            } else if (input.equals("launch_test")) {
+                test();
+                System.out.println("Test launched");
             } else if (input.equals("help")) {
                 System.out.println("exit: stop the server");
                 System.out.println("restart: restart the server");
-                System.out.println("help: show this help");
+                System.out.println("launch_test: launch a test");
             } else {
                 System.out.println("Unknown command, \"help\" for help");
             }
         }
 
         scanner.close();
+    }
+
+    public static void test() {
+        ClientUDPTester clientUDPTester = new ClientUDPTester("localhost", 1234);
+        // TODO faire des tests ici
     }
 }

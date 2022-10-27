@@ -3,6 +3,7 @@ package sale_server.requete.tare;
 import sale_server.data_type.DispoAt;
 import sale_server.data_type.ExtractionType;
 import sale_server.data_type.Pays;
+import sale_server.identifier.TareID;
 
 import java.util.*;
 
@@ -22,7 +23,8 @@ public class EnergieListeRequete extends TareRequete {
 
     public EnergieListeRequete(List<Pays> originePreferentiel, List<Pays> origineInterdit, int budgetMax,
                                int prixMaxUE, int quantiteMin, int quantiteDemandee, Optional<DispoAt> dispoAt,
-                               Optional<ExtractionType> extractionType) {
+                               Optional<ExtractionType> extractionType, TareID tareID) {
+        super(tareID);
         this.originePreferentiel = originePreferentiel;
         this.origineInterdit = origineInterdit;
         this.budgetMax = budgetMax;

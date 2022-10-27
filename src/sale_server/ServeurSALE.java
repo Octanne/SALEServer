@@ -147,22 +147,22 @@ public class ServeurSALE extends Thread{
     }
 
     private AbstractReponse repondre(AjoutEnergieRequete requete) {
-
+        // TODO
         return null;
     }
 
     private AbstractReponse repondre(SuppressionEnergieRequete requete) {
-
+        // TODO
         return null;
     }
 
     private AbstractReponse repondre(EnergieAchatRequete requete) {
-
+        // TODO
         return null;
     }
 
     private AbstractReponse repondre(EnergieListeRequete requete) {
-
+        // TODO
         return null;
     }
 
