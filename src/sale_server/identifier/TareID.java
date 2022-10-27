@@ -1,6 +1,8 @@
 package sale_server.identifier;
 
-public class TareID {
+import java.io.Serializable;
+
+public class TareID implements Serializable, Identifier {
 
     private final int serialId;
     private String privateKey;
@@ -14,12 +16,16 @@ public class TareID {
         return serialId;
     }
 
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
     public void changePrivateKey(String newPrivateKey) {
         this.privateKey = newPrivateKey;
     }
 
-    public boolean checkID(TareID tareID) {
-        return serialId == tareID.serialId && privateKey.equals(tareID.privateKey);
+    public boolean checkID(Identifier tareID) {
+        return serialId == tareID.getSerialId() && privateKey.equals(tareID.getPrivateKey());
     }
 
 }

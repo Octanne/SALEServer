@@ -13,6 +13,11 @@ public class SuppressionEnergieRequete extends PoneRequete {
         this.idOffres = idOffres;
     }
 
+    public SuppressionEnergieRequete(PoneID poneID, UUID[] idOffres, int portReponse) {
+        super(poneID, portReponse);
+        this.idOffres = idOffres;
+    }
+
     public UUID[] getIdOffres() {
         return idOffres;
     }

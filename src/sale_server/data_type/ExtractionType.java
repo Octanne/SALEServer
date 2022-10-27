@@ -16,7 +16,7 @@ public enum ExtractionType implements Serializable {
         this.numSerial = numSerial;
     }
 
-    private int numSerial;
+    private final int numSerial;
 
     public int getNumSerial() {
         return numSerial;

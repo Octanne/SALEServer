@@ -13,6 +13,11 @@ public class EnergieAchatRequete extends TareRequete {
         this.idOffres = idOffres;
     }
 
+    public EnergieAchatRequete(TareID tareID, UUID[] idOffres, int portReponse) {
+        super(tareID, portReponse);
+        this.idOffres = idOffres;
+    }
+
     public UUID[] getIDOffres() {
         return idOffres;
     }

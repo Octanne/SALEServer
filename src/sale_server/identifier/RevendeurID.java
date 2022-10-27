@@ -1,4 +1,6 @@
 package sale_server.identifier;
 
-public class RevendeurID {
+import java.io.Serializable;
+
+public class RevendeurID implements Serializable {
 }

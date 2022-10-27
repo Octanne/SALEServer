@@ -7,11 +7,17 @@ public abstract class TareRequete extends AbstractRequete {
 
     private final TareID tareID;
 
-    public TareRequete(TareID tareID) {
+    public TareRequete(TareID tareID, int portReponse) {
+        super(portReponse);
         this.tareID = tareID;
     }
 
-    public TareID getTareID() {
+    public TareRequete(TareID tareID) {
+        super();
+        this.tareID = tareID;
+    }
+
+    public TareID getAuthID() {
         return tareID;
     }
 }

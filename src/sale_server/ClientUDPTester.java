@@ -1,3 +1,5 @@
+package sale_server;
+
 import sale_server.reponse.AbstractReponse;
 import sale_server.reponse.UnreconizedReponse;
 import sale_server.requete.AbstractRequete;
@@ -11,16 +13,19 @@ import java.net.UnknownHostException;
 
 public class ClientUDPTester {
 
-    private final int port;
+    private final int portEcoute;
+    private final int portServeur;
     private final String addresseStr;
 
     /**
      * Construit un client UDP
-     * @param addresse l'adresse du serveur
-     * @param port le port du serveur
+     * @param addresse l'adresse du serveur.
+     * @param portServeur le port du serveur.
+     * @param portEcoute le port d'écoute du client.
      */
-    public ClientUDPTester(String addresse, int port) {
-        this.port = port;
+    public ClientUDPTester(String addresse, int portServeur, int portEcoute) {
+        this.portEcoute = portEcoute;
+        this.portServeur = portServeur;
         this.addresseStr = addresse;
     }
 
@@ -31,7 +36,8 @@ public class ClientUDPTester {
      */
     public ClientUDPTester() {
         addresseStr = "localhost";
-        port = 3031;
+        portServeur = 3031;
+        portEcoute = 3032;
     }
 
     /**
@@ -45,7 +51,7 @@ public class ClientUDPTester {
         // Création de la socket
         DatagramSocket socket = null;
         try {
-            socket = new DatagramSocket();
+            socket = new DatagramSocket(portEcoute);
         } catch(SocketException e) {
             System.err.println("Erreur lors de la création du socket : " + e);
             return false;
@@ -67,7 +73,7 @@ public class ClientUDPTester {
             byte[] donnees = baos.toByteArray();
             InetAddress adresse = InetAddress.getByName(addresseStr);
             DatagramPacket msg = new DatagramPacket(donnees, donnees.length,
-                                                    adresse, port);
+                                                    adresse, portServeur);
             socket.send(msg);
         } catch(UnknownHostException e) {
             System.err.println("Erreur lors de la création de l'adresse : " + e);
@@ -96,20 +102,20 @@ public class ClientUDPTester {
             ByteArrayInputStream bais = new ByteArrayInputStream(msgRecu.getData());
             ObjectInputStream ois = new ObjectInputStream(bais);
             AbstractReponse reponse = (AbstractReponse) ois.readObject();
-            System.out.println("Requete recue : " + reponse.getClass().getSimpleName());
+            System.out.println("[CLI] Réponse recue : " + reponse.getClass().getSimpleName());
 
             if (reponse instanceof UnreconizedReponse) {
-                System.out.println("Requete non reconnue : " + reponse.getStatusMessage());
+                System.out.println("[CLI] Réponse d'erreur : " + reponse.getStatusMessage());
             } else {
                 handler.handle(reponse);
             }
             return true;
         } catch(ClassNotFoundException e) {
-            System.err.println("Objet reçu non reconnu : " + e);
+            System.err.println("[CLI] Objet reçu non reconnu : " + e);
             socket.close();
             return false;
         } catch(IOException e) {
-            System.err.println("Erreur lors de la récupération de l'objet : " + e);
+            System.err.println("[CLI] Erreur lors de la récupération de l'objet : " + e);
             socket.close();
             return false;
         }

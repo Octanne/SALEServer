@@ -13,6 +13,11 @@ public class AjoutEnergieRequete extends PoneRequete {
         this.newOffres = newOffres;
     }
 
+    public AjoutEnergieRequete(PoneID poneID, PoneOffreEnergie[] newOffres, int portReponse) {
+        super(poneID, portReponse);
+        this.newOffres = newOffres;
+    }
+
     public PoneOffreEnergie[] getNewOffres() {
         return newOffres;
     }
