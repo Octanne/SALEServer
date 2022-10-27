@@ -1,0 +1,5 @@
+1 ) Listes des requêtes :
+    1 : demander la liste des unitées d'energie dispos suivant des critères. (Retourne un tableau) (TARE)
+    2 : ajouter une unitée d'energie. (Retourne un état de validation) (PONE)
+    3 : supprimer une unitée d'energie. (Retourne un état de validation) (PONE)
+    4 : demander l'achat d'une unité d'energie. (Retourne un état de validation) (TARE)
