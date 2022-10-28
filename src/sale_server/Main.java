@@ -91,7 +91,7 @@ public class Main {
         paysP.add(Pays.FRANCE);
         paysP.add(Pays.UNITED_STATES);
 
-        TareID tareID = new TareID(45884,"tare2");
+        TareID tareID = new TareID(45884,"tare1");
 
         EnergieListeRequete energieListeRequete = new EnergieListeRequete(paysP, new ArrayList<>(),
                 149000,500,200,1500, null,

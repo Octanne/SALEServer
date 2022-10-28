@@ -109,6 +109,7 @@ public class ClientUDPTester {
             } else {
                 handler.handle(reponse);
             }
+            socket.close();
             return true;
         } catch(ClassNotFoundException e) {
             System.err.println("[CLI] Objet reçu non reconnu : " + e);
