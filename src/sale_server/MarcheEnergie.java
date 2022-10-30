@@ -6,6 +6,7 @@ import sale_server.requete.tare.EnergieListeRequete;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MarcheEnergie {
 
@@ -17,6 +18,18 @@ public class MarcheEnergie {
 
     public void addOffer(PoneOffreEnergie offer) {
         offreEnergies.add(offer);
+    }
+
+    public boolean removeOffer(PoneOffreEnergie offer) {
+        return offreEnergies.remove(offer);
+    }
+
+    public PoneOffreEnergie getEnergieFromUUID(UUID id) {
+        return offreEnergies.stream().filter(offer -> offer.getOffreID().equals(id)).findFirst().orElse(null);
+    }
+
+    public boolean hasEnergieFromUUID(UUID id) {
+        return offreEnergies.stream().anyMatch(offer -> offer.getOffreID().equals(id));
     }
 
     public List<PoneOffreEnergie> getOffreEnergies() {

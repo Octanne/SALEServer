@@ -1,15 +1,20 @@
 package sale_server;
 
 import sale_server.data_type.*;
+import sale_server.data_type.statut.StatutAjout;
+import sale_server.identifier.PoneID;
 import sale_server.identifier.TareID;
 import sale_server.reponse.AbstractReponse;
+import sale_server.reponse.pone.AjoutEnergieReponse;
+import sale_server.reponse.pone.SuppressionEnergieReponse;
+import sale_server.reponse.tare.EnergieAchatReponse;
 import sale_server.reponse.tare.EnergieListeReponse;
+import sale_server.requete.pone.AjoutEnergieRequete;
+import sale_server.requete.pone.SuppressionEnergieRequete;
+import sale_server.requete.tare.EnergieAchatRequete;
 import sale_server.requete.tare.EnergieListeRequete;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
@@ -82,6 +87,7 @@ public class Main {
         marcheEnergie.addOffer(new PoneOffreEnergie(54228, EnergieType.COAL,
                 ExtractionType.CONVENTIONAL, Pays.GERMANY, 100,
                 new DispoAt(21, 5, 2018, 0, 0)));
+        marcheEnergie.getOffreEnergies().get(5).soldTo(new TareID(43,"tare1"));
     }
 
     public static void test() {
@@ -91,8 +97,8 @@ public class Main {
         paysP.add(Pays.FRANCE);
         paysP.add(Pays.UNITED_STATES);
 
+        // Test requete de liste d'energie
         TareID tareID = new TareID(45884,"tare1");
-
         EnergieListeRequete energieListeRequete = new EnergieListeRequete(paysP, new ArrayList<>(),
                 149000,500,200,1500, null,
                 null, null, tareID);
@@ -113,6 +119,77 @@ public class Main {
             }
         });
 
-        // TODO faire des tests ici
+        // Test energie achat requete
+        EnergieAchatRequete energieAchatRequete = new EnergieAchatRequete(tareID, new UUID[] {
+                UUID.randomUUID(),
+                Main.marcheEnergie.getOffreEnergies().get(0).getOffreID(),
+                Main.marcheEnergie.getOffreEnergies().get(3).getOffreID(),
+                Main.marcheEnergie.getOffreEnergies().get(5).getOffreID(),
+        });
+
+        clientUDPTester.envoyerRequete(energieAchatRequete, new ClientUDPTester.ReponseHandler() {
+            @Override
+            public void handle(AbstractReponse reponse) {
+                System.out.println("[CLI] Réponse du serveur : " + reponse.getStatusMessage());
+                System.out.println("[CLI] Type de réponse : " + reponse.getClass().getSimpleName());
+                // Nombre d'offre
+                System.out.println("[CLI] Nombre d'offre : " + ((EnergieAchatReponse) reponse).getResultAchatEnergie().size());
+                // Afficher les offres
+                EnergieAchatReponse energieAchatReponse = (EnergieAchatReponse) reponse;
+                System.out.println("[CLI] Result d'achat : ");
+                for (UUID offreEnergie : energieAchatReponse.getResultAchatEnergie().keySet()) {
+                    System.out.println("[CLI] " + offreEnergie + " : " + energieAchatReponse.getResultAchatEnergie().get(offreEnergie));
+                }
+            }
+        });
+
+        // Test requête d'ajout energie
+        PoneID poneID = new PoneID(1558, "pone1");
+        PoneOffreEnergie poneOffreEnergie[] = {
+                new PoneOffreEnergie(10223, EnergieType.ELECTRICITY,
+                ExtractionType.NUCLEAR, Pays.FRANCE, 100,
+                new DispoAt(21, 5, 2018, 0, 0)),
+
+                new PoneOffreEnergie(10224, EnergieType.ELECTRICITY,
+                        ExtractionType.SOLAR, Pays.GERMANY, 100,
+                        new DispoAt(21, 5, 2018, 0, 0))
+        };
+
+        AjoutEnergieRequete energieAjoutRequete = new AjoutEnergieRequete(poneID, poneOffreEnergie);
+        clientUDPTester.envoyerRequete(energieAjoutRequete, new ClientUDPTester.ReponseHandler() {
+            @Override
+            public void handle(AbstractReponse reponse) {
+                System.out.println("[CLI] Réponse du serveur : " + reponse.getStatusMessage());
+                System.out.println("[CLI] Type de réponse : " + reponse.getClass().getSimpleName());
+                // Afficher les offres
+                AjoutEnergieReponse ajoutEnergieReponse = (AjoutEnergieReponse) reponse;
+                System.out.println("[CLI] Les réponses : ");
+                for (UUID status : ajoutEnergieReponse.getResultAjoutEnergie().keySet()) {
+                    System.out.println("[CLI] " + status + " : " + ajoutEnergieReponse.getResultAjoutEnergie().get(status));
+                }
+            }
+        });
+
+        // Test requête de suppression energie
+        SuppressionEnergieRequete suppressionEnergieRequete = new SuppressionEnergieRequete(poneID,
+                new UUID[]{
+                        UUID.randomUUID(),
+                        poneOffreEnergie[0].getOffreID(),
+                        poneOffreEnergie[1].getOffreID()
+                });
+        clientUDPTester.envoyerRequete(suppressionEnergieRequete, new ClientUDPTester.ReponseHandler() {
+            @Override
+            public void handle(AbstractReponse reponse) {
+                System.out.println("[CLI] Réponse du serveur : " + reponse.getStatusMessage());
+                System.out.println("[CLI] Type de réponse : " + reponse.getClass().getSimpleName());
+                // Afficher les offres
+                SuppressionEnergieReponse suppressionEnergieReponse = (SuppressionEnergieReponse) reponse;
+                System.out.println("[CLI] Les réponses : ");
+                for (UUID status : suppressionEnergieReponse.getResultSuppressionEnergie().keySet()) {
+                    System.out.println("[CLI] " + status + " : " +
+                            suppressionEnergieReponse.getResultSuppressionEnergie().get(status));
+                }
+            }
+        });
     }
 }

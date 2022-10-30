@@ -1,6 +1,9 @@
 package sale_server;
 
 import sale_server.data_type.*;
+import sale_server.data_type.statut.StatutAchat;
+import sale_server.data_type.statut.StatutAjout;
+import sale_server.data_type.statut.StatutSuppression;
 import sale_server.identifier.Identifier;
 import sale_server.identifier.PoneID;
 import sale_server.identifier.TareID;
@@ -12,11 +15,9 @@ import sale_server.reponse.tare.EnergieAchatReponse;
 import sale_server.reponse.tare.EnergieListeReponse;
 import sale_server.requete.AbstractRequete;
 import sale_server.requete.pone.AjoutEnergieRequete;
-import sale_server.requete.pone.PoneRequete;
 import sale_server.requete.pone.SuppressionEnergieRequete;
 import sale_server.requete.tare.EnergieAchatRequete;
 import sale_server.requete.tare.EnergieListeRequete;
-import sale_server.requete.tare.TareRequete;
 
 import java.io.*;
 import java.net.DatagramPacket;
@@ -26,6 +27,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class ServeurSALE extends Thread{
 
@@ -34,7 +36,7 @@ public class ServeurSALE extends Thread{
     private boolean running, isActive;
 
     // Stockage temporaire des IDS
-    private List<Identifier> ids_storage;
+    private final List<Identifier> ids_storage;
 
     public ServeurSALE(int portEcoute) {
         super("ServeurSALE");
@@ -75,7 +77,7 @@ public class ServeurSALE extends Thread{
             if (!isActive) continue;
 
             // Lecture du message du client
-            DatagramPacket msgRecu = null;
+            DatagramPacket msgRecu;
             try {
                 byte[] tampon = new byte[8164];
                 msgRecu = new DatagramPacket(tampon, tampon.length);
@@ -175,7 +177,16 @@ public class ServeurSALE extends Thread{
     private AbstractReponse repondre(AjoutEnergieRequete requete) {
         if (checkAuthentification(requete)) {
             AjoutEnergieReponse reponse = new AjoutEnergieReponse(new HashMap<>());
-            // TODO
+
+            for (PoneOffreEnergie newOffre : requete.getNewOffres()) {
+                if (Main.marcheEnergie.getEnergieFromUUID(newOffre.getOffreID()) != null) {
+                    reponse.putResultAjoutEnergie(newOffre.getOffreID(), StatutAjout.ID_ALREADY_EXISTS);
+                } else {
+                    Main.marcheEnergie.addOffer(newOffre);
+                    reponse.putResultAjoutEnergie(newOffre.getOffreID(), StatutAjout.SUCCESS);
+                }
+            }
+
             return reponse;
         } else {
             return new UnreconizedReponse("Authentification incorrecte");
@@ -185,7 +196,18 @@ public class ServeurSALE extends Thread{
     private AbstractReponse repondre(SuppressionEnergieRequete requete) {
         if (checkAuthentification(requete)) {
             SuppressionEnergieReponse reponse = new SuppressionEnergieReponse(new HashMap<>());
-            // TODO
+
+            for (UUID idOffre : requete.getIdOffres()) {
+                PoneOffreEnergie offre = Main.marcheEnergie.getEnergieFromUUID(idOffre);
+
+                if (offre != null) {
+                    reponse.putResultSuppressionEnergie(idOffre, StatutSuppression.SUCCESS);
+                    Main.marcheEnergie.removeOffer(offre);
+                } else {
+                    reponse.putResultSuppressionEnergie(idOffre, StatutSuppression.NOT_FOUND);
+                }
+            }
+
             return reponse;
         } else {
             return new UnreconizedReponse("Authentification incorrecte");
@@ -195,7 +217,21 @@ public class ServeurSALE extends Thread{
     private AbstractReponse repondre(EnergieAchatRequete requete) {
         if (checkAuthentification(requete)) {
             EnergieAchatReponse reponse = new EnergieAchatReponse(new HashMap<>());
-            // TODO
+            for (UUID idOffre : requete.getIDOffres()) {
+                PoneOffreEnergie offre = Main.marcheEnergie.getEnergieFromUUID(idOffre);
+
+                if (offre != null) {
+                    if (offre.isSold()) {
+                        reponse.putResultAchatEnergie(idOffre, StatutAchat.NOT_AVAILABLE);
+                    } else {
+                        reponse.putResultAchatEnergie(idOffre, StatutAchat.SUCCESS);
+                        offre.soldTo(requete.getAuthID());
+                    }
+                } else {
+                    reponse.putResultAchatEnergie(idOffre, StatutAchat.NOT_FOUND);
+                }
+            }
+
             return reponse;
         } else {
             return new UnreconizedReponse("Authentification incorrecte");
@@ -214,7 +250,7 @@ public class ServeurSALE extends Thread{
             }
 
             // creation d'une var reponse de type : EnergieListeReponse
-            return new EnergieListeReponse(liste.toArray(new PoneOffreEnergie[liste.size()]));
+            return new EnergieListeReponse(liste.toArray(new PoneOffreEnergie[0]));
         } else {
             return new UnreconizedReponse("Authentification échouée");
         }
@@ -223,7 +259,8 @@ public class ServeurSALE extends Thread{
     public boolean checkAuthentification(AbstractRequete requete) {
         for (Identifier id : ids_storage) {
             if (id.checkID(requete.getAuthID())) {
-                return true;
+                if (id instanceof TareID && requete.getAuthID() instanceof TareID) return true;
+                else return id instanceof PoneID && requete.getAuthID() instanceof PoneID;
             }
         }
 

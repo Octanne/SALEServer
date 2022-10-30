@@ -1,22 +1,24 @@
 package sale_server.reponse.tare;
 
+import sale_server.data_type.statut.StatutAchat;
+
 import java.util.HashMap;
 import java.util.UUID;
 
 public class EnergieAchatReponse extends TareReponse {
 
-    private final HashMap<UUID, Boolean> resultAchatEnergie;
+    private final HashMap<UUID, StatutAchat> resultAchatEnergie;
 
-    public EnergieAchatReponse(HashMap<UUID, Boolean> resultAchatEnergie) {
+    public EnergieAchatReponse(HashMap<UUID, StatutAchat> resultAchatEnergie) {
         this.resultAchatEnergie = resultAchatEnergie;
     }
 
-    public HashMap<UUID, Boolean> getResultAchatEnergie() {
+    public HashMap<UUID, StatutAchat> getResultAchatEnergie() {
         return resultAchatEnergie;
     }
 
-    public boolean setResultAchatEnergie(UUID idEnergie, boolean result) {
-        return Boolean.TRUE.equals(resultAchatEnergie.put(idEnergie, result));
+    public void putResultAchatEnergie(UUID idEnergie, StatutAchat result) {
+        resultAchatEnergie.put(idEnergie, result);
     }
 
 }

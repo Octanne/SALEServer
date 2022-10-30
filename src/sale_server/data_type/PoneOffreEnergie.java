@@ -26,6 +26,10 @@ public class PoneOffreEnergie implements Serializable {
 
     private final UUID offreID;
 
+    /* Sold data */
+    private boolean isSold;
+    private TareID isSoldTo;
+
     public PoneOffreEnergie(int quantiteEnergie, EnergieType typeEnergie, ExtractionType extractionType
             , Pays origine, int prixUE, DispoAt dispoAt) {
         this.quantiteEnergie = quantiteEnergie;
@@ -35,6 +39,9 @@ public class PoneOffreEnergie implements Serializable {
         this.prixUE = prixUE;
         this.dateDisponibilite = dispoAt.getCalendar();
         this.offreID = UUID.randomUUID();
+
+        this.isSold = false;
+        this.isSoldTo = null;
     }
 
     public int getQuantiteEnergie() {
@@ -93,4 +100,16 @@ public class PoneOffreEnergie implements Serializable {
         return new byte[]{(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00};
     }
 
+    public boolean isSold() {
+        return isSold;
+    }
+
+    public boolean soldTo(TareID tareID) {
+        if (isSold) {
+            return false;
+        }
+        isSold = true;
+        isSoldTo = tareID;
+        return true;
+    }
 }
